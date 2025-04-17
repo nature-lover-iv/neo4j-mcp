@@ -20,6 +20,7 @@ cd neo4j-mcp
 
 # Install the package
 pip install -e .
+or pip install git+https://github.com/nature-lover-iv/neo4j-mcp.git
 ```
 
 ## Usage
@@ -141,6 +142,46 @@ The Neo4j MCP server provides the following tools:
 
 - `find_shortest_path`: Find the shortest path between two nodes.
 - `find_all_paths`: Find all paths between two nodes.
+
+## Testing
+
+The Neo4j MCP server includes a comprehensive test suite to ensure its functionality:
+
+### Unit Tests
+
+Unit tests verify the functionality of individual components without requiring a Neo4j database:
+
+```bash
+# Run unit tests only
+python3 tests/run_tests.py --unit
+```
+
+### Integration Tests
+
+Integration tests verify the functionality of the server with a real Neo4j database:
+
+```bash
+# Run integration tests only
+python3 tests/run_tests.py --integration
+```
+
+### MCP Tool Tests
+
+MCP tool tests verify the functionality of the MCP tools directly:
+
+```bash
+# Run MCP tool tests only
+python3 tests/run_tests.py --mcp
+```
+
+### Running All Tests
+
+You can run all tests with:
+
+```bash
+# Run all tests
+python3 tests/run_tests.py
+```
 
 ## License
 

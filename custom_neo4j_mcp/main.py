@@ -8,9 +8,9 @@ import asyncio
 import argparse
 import logging
 
-from .core.server import Neo4jMCPServer
-from .utils.config import load_config
-from .utils.logging import setup_logging
+from custom_neo4j_mcp.core.server import Neo4jMCPServer
+from custom_neo4j_mcp.utils.config import load_config
+from custom_neo4j_mcp.utils.logging import setup_logging
 
 def parse_args():
     """

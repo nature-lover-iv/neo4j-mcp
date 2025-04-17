@@ -549,7 +549,7 @@ class Neo4jMCPServer:
         
     # Tool handler implementations
     
-    async def get_schema(self, arguments: Dict[str, Any]) -> List[types.Content]:
+    async def get_schema(self, arguments: Dict[str, Any]) -> List[types.TextContent]:
         """
         Get the database schema.
         
@@ -561,16 +561,15 @@ class Neo4jMCPServer:
         """
         detailed = arguments.get("detailed", False)
         
-        if detailed:
-            # Get detailed schema with APOC if available
-            schema = self.db.get_schema()
-        else:
-            # Get basic schema
+        # Always use basic schema for now since APOC might not be available
+        try:
             schema = self.db.get_basic_schema()
-            
-        return [types.TextContent(type="text", text=json.dumps(schema, indent=2))]
+            return [types.TextContent(type="text", text=json.dumps(schema, indent=2))]
+        except Exception as e:
+            logger.error(f"Error getting basic schema: {e}")
+            return [types.TextContent(type="text", text=f"Error getting schema: {str(e)}")]
         
-    async def get_database_info(self, arguments: Dict[str, Any]) -> List[types.Content]:
+    async def get_database_info(self, arguments: Dict[str, Any]) -> List[types.TextContent]:
         """
         Get information about the Neo4j database.
         
@@ -583,7 +582,7 @@ class Neo4jMCPServer:
         info = self.db.get_database_info()
         return [types.TextContent(type="text", text=json.dumps(info, indent=2))]
         
-    async def execute_read_query(self, arguments: Dict[str, Any]) -> List[types.Content]:
+    async def execute_read_query(self, arguments: Dict[str, Any]) -> List[types.TextContent]:
         """
         Execute a read Cypher query.
         
@@ -602,7 +601,7 @@ class Neo4jMCPServer:
         results = self.db.run_query(query, params)
         return [types.TextContent(type="text", text=json.dumps(results, indent=2))]
         
-    async def execute_write_query(self, arguments: Dict[str, Any]) -> List[types.Content]:
+    async def execute_write_query(self, arguments: Dict[str, Any]) -> List[types.TextContent]:
         """
         Execute a write Cypher query.
         
@@ -621,7 +620,7 @@ class Neo4jMCPServer:
         results = self.db.run_write_query(query, params)
         return [types.TextContent(type="text", text=json.dumps(results, indent=2))]
         
-    async def explain_query(self, arguments: Dict[str, Any]) -> List[types.Content]:
+    async def explain_query(self, arguments: Dict[str, Any]) -> List[types.TextContent]:
         """
         Explain a Cypher query execution plan.
         
@@ -668,7 +667,7 @@ class Neo4jMCPServer:
         except Exception as e:
             return [types.TextContent(type="text", text=f"Error explaining query: {str(e)}")]
             
-    async def get_database_statistics(self, arguments: Dict[str, Any]) -> List[types.Content]:
+    async def get_database_statistics(self, arguments: Dict[str, Any]) -> List[types.TextContent]:
         """
         Get statistics about the Neo4j database.
         
@@ -689,7 +688,7 @@ class Neo4jMCPServer:
         
         return [types.TextContent(type="text", text=json.dumps(stats, indent=2))]
         
-    async def get_node_counts_by_label(self, arguments: Dict[str, Any]) -> List[types.Content]:
+    async def get_node_counts_by_label(self, arguments: Dict[str, Any]) -> List[types.TextContent]:
         """
         Get the number of nodes for each label in the database.
         
@@ -711,7 +710,7 @@ class Neo4jMCPServer:
                 
         return [types.TextContent(type="text", text=json.dumps(counts, indent=2))]
         
-    async def get_relationship_counts_by_type(self, arguments: Dict[str, Any]) -> List[types.Content]:
+    async def get_relationship_counts_by_type(self, arguments: Dict[str, Any]) -> List[types.TextContent]:
         """
         Get the number of relationships for each type in the database.
         
@@ -733,7 +732,7 @@ class Neo4jMCPServer:
                 
         return [types.TextContent(type="text", text=json.dumps(counts, indent=2))]
         
-    async def get_indexes(self, arguments: Dict[str, Any]) -> List[types.Content]:
+    async def get_indexes(self, arguments: Dict[str, Any]) -> List[types.TextContent]:
         """
         Get all indexes in the database.
         
@@ -746,7 +745,7 @@ class Neo4jMCPServer:
         indexes = self.db.get_indexes()
         return [types.TextContent(type="text", text=json.dumps(indexes, indent=2))]
         
-    async def get_constraints(self, arguments: Dict[str, Any]) -> List[types.Content]:
+    async def get_constraints(self, arguments: Dict[str, Any]) -> List[types.TextContent]:
         """
         Get all constraints in the database.
         
@@ -759,7 +758,7 @@ class Neo4jMCPServer:
         constraints = self.db.get_constraints()
         return [types.TextContent(type="text", text=json.dumps(constraints, indent=2))]
         
-    async def create_index(self, arguments: Dict[str, Any]) -> List[types.Content]:
+    async def create_index(self, arguments: Dict[str, Any]) -> List[types.TextContent]:
         """
         Create a new index in the database.
         
@@ -792,7 +791,7 @@ class Neo4jMCPServer:
         except Exception as e:
             return [types.TextContent(type="text", text=f"Error creating index: {str(e)}")]
             
-    async def create_constraint(self, arguments: Dict[str, Any]) -> List[types.Content]:
+    async def create_constraint(self, arguments: Dict[str, Any]) -> List[types.TextContent]:
         """
         Create a new constraint in the database.
         
@@ -836,7 +835,7 @@ class Neo4jMCPServer:
         except Exception as e:
             return [types.TextContent(type="text", text=f"Error creating constraint: {str(e)}")]
             
-    async def drop_index(self, arguments: Dict[str, Any]) -> List[types.Content]:
+    async def drop_index(self, arguments: Dict[str, Any]) -> List[types.TextContent]:
         """
         Drop an index from the database.
         
@@ -859,7 +858,7 @@ class Neo4jMCPServer:
         except Exception as e:
             return [types.TextContent(type="text", text=f"Error dropping index: {str(e)}")]
             
-    async def drop_constraint(self, arguments: Dict[str, Any]) -> List[types.Content]:
+    async def drop_constraint(self, arguments: Dict[str, Any]) -> List[types.TextContent]:
         """
         Drop a constraint from the database.
         
@@ -882,7 +881,7 @@ class Neo4jMCPServer:
         except Exception as e:
             return [types.TextContent(type="text", text=f"Error dropping constraint: {str(e)}")]
             
-    async def get_sample_data(self, arguments: Dict[str, Any]) -> List[types.Content]:
+    async def get_sample_data(self, arguments: Dict[str, Any]) -> List[types.TextContent]:
         """
         Get sample data for each node label in the database.
         
@@ -912,7 +911,7 @@ class Neo4jMCPServer:
             
         return [types.TextContent(type="text", text=json.dumps(sample_data, indent=2))]
         
-    async def find_nodes(self, arguments: Dict[str, Any]) -> List[types.Content]:
+    async def find_nodes(self, arguments: Dict[str, Any]) -> List[types.TextContent]:
         """
         Find nodes in the database based on label and property conditions.
         
@@ -952,7 +951,7 @@ class Neo4jMCPServer:
         except Exception as e:
             return [types.TextContent(type="text", text=f"Error finding nodes: {str(e)}")]
             
-    async def find_relationships(self, arguments: Dict[str, Any]) -> List[types.Content]:
+    async def find_relationships(self, arguments: Dict[str, Any]) -> List[types.TextContent]:
         """
         Find relationships in the database based on type and property conditions.
         
@@ -998,7 +997,7 @@ class Neo4jMCPServer:
         except Exception as e:
             return [types.TextContent(type="text", text=f"Error finding relationships: {str(e)}")]
             
-    async def find_paths(self, arguments: Dict[str, Any]) -> List[types.Content]:
+    async def find_paths(self, arguments: Dict[str, Any]) -> List[types.TextContent]:
         """
         Find paths between nodes in the database.
         
@@ -1062,7 +1061,7 @@ class Neo4jMCPServer:
         except Exception as e:
             return [types.TextContent(type="text", text=f"Error finding paths: {str(e)}")]
             
-    async def find_shortest_path(self, arguments: Dict[str, Any]) -> List[types.Content]:
+    async def find_shortest_path(self, arguments: Dict[str, Any]) -> List[types.TextContent]:
         """
         Find the shortest path between two nodes.
         
@@ -1132,7 +1131,7 @@ class Neo4jMCPServer:
         except Exception as e:
             return [types.TextContent(type="text", text=f"Error finding shortest path: {str(e)}")]
             
-    async def find_all_paths(self, arguments: Dict[str, Any]) -> List[types.Content]:
+    async def find_all_paths(self, arguments: Dict[str, Any]) -> List[types.TextContent]:
         """
         Find all paths between two nodes.
         

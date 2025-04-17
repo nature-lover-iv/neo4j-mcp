@@ -44,7 +44,7 @@ class Neo4jDatabase:
         try:
             self._driver = GraphDatabase.driver(
                 self.uri,
-                auth=(self.username, self.password)
+                auth=(self.username, self.password) if self.password else None
             )
             self.verify_connectivity()
             logger.info(f"Connected to Neo4j at {self.uri}")
@@ -154,15 +154,20 @@ class Neo4jDatabase:
             """
             
             with self.get_session() as session:
-                result = session.run(query)
-                record = result.single()
-                if record:
-                    return record["value"]
-                return {}
+                try:
+                    result = session.run(query)
+                    record = result.single()
+                    if record:
+                        return record["value"]
+                    return {}
+                except Exception as e:
+                    # APOC procedure not found or other error
+                    logger.info(f"APOC not available, using basic schema: {e}")
+                    return self.get_basic_schema()
                 
         except Exception as e:
             # Fall back to basic schema information
-            logger.info(f"APOC not available, using basic schema: {e}")
+            logger.info(f"Error getting schema, using basic schema: {e}")
             return self.get_basic_schema()
             
     def get_basic_schema(self) -> Dict[str, Any]:
