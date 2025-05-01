@@ -9,7 +9,6 @@ setup(
     packages=find_packages(),
     install_requires=[
         "neo4j>=5.0.0",
-        "mcp>=0.9.0",
         "pydantic>=2.0.0",
     ],
     entry_points={
